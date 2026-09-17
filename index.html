@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f2b46">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BoekhoudPro">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="Lokale boekhoud-PWA met UBL- en Copilot JSON-import, conceptboekingen en audittrail.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>BoekhoudPro</title>
+</head>
+<body>
+<div id="offlineBanner" class="offline hidden">Offline modus</div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#dashboard" aria-label="BoekhoudPro dashboard"><img src="icons/icon-192.png" alt=""><span><strong>BoekhoudPro</strong><small>Finance PWA</small></span></a>
+    <nav id="nav">
+      <button data-page="dashboard" class="active">▦ <span>Dashboard</span></button>
+      <button data-page="invoices">▣ <span>Facturen</span></button>
+      <button data-page="concepts">⇩ <span>Conceptboekingen</span></button>
+      <button data-page="journal">✎ <span>Journaal</span></button>
+      <button data-page="ledger">☷ <span>Grootboek</span></button>
+      <button data-page="reports">▤ <span>Rapportages</span></button>
+      <button data-page="contacts">♙ <span>Relaties</span></button>
+      <button data-page="settings">⚙ <span>Instellingen</span></button>
+    </nav>
+    <div class="side-status"><span id="dbStatus">Lokale database</span><small id="appVersion">v1.0.0</small></div>
+  </aside>
+  <main>
+    <header class="topbar"><div><h1 id="pageTitle">Dashboard</h1><span id="companyLabel"></span></div><div class="top-actions"><button id="installButton" class="button ghost hidden">Installeer app</button><label class="button primary">Factuur importeren<input id="quickImport" type="file" accept=".xml,.json,application/xml,text/xml,application/json" hidden></label></div></header>
+    <div class="mobile-commandbar">
+      <div><strong id="mobileTitle">Dashboard</strong><small id="mobileCompany"></small></div>
+      <label class="mobile-scan" aria-label="Factuurfoto kiezen">＋<input id="cameraImport" type="file" accept="image/*,.xml,.json,application/xml,application/json" capture="environment" hidden></label>
+    </div>
+    <div class="content">
+      <section class="page active" id="dashboard">
+        <div class="page-head"><div><h2>Financieel overzicht</h2><p>Resultaten uit goedgekeurde journaalposten.</p></div></div>
+        <div class="mobile-quick-actions">
+          <label class="mobile-action primary-action"><span class="action-icon">▣</span><strong>UBL of JSON</strong><small>Importeer factuur</small><input id="mobileFileImport" type="file" accept=".xml,.json,application/xml,text/xml,application/json" hidden></label>
+          <button class="mobile-action" data-mobile-page="concepts"><span class="action-icon">✓</span><strong>Controleren</strong><small>Open concepten</small></button>
+          <button class="mobile-action" data-mobile-page="reports"><span class="action-icon">▤</span><strong>Rapportage</strong><small>Bekijk resultaten</small></button>
+        </div>
+        <div class="kpi-grid"><article class="card"><span>Omzet</span><b id="kpiRevenue">€ 0</b></article><article class="card"><span>Kosten</span><b id="kpiCosts">€ 0</b></article><article class="card"><span>Resultaat</span><b id="kpiResult">€ 0</b></article><article class="card"><span>Te controleren</span><b id="kpiPending">0</b></article></div>
+        <div class="two-col"><article class="card"><h3>Administratiekwaliteit</h3><div class="status-list"><p><span>Journaalposten</span><b id="statEntries">0</b></p><p><span>Conceptboekingen</span><b id="statConcepts">0</b></p><p><span>Relaties</span><b id="statContacts">0</b></p><p><span>Debet = credit</span><b id="statBalanced">Ja</b></p></div></article><article class="card"><h3>Snel starten</h3><ol><li>Importeer een UBL 2.1 XML of Copilot JSON.</li><li>Controleer de voorgestelde boeking.</li><li>Keur goed of wijs af met reden.</li><li>Bekijk journaal, grootboek en audittrail.</li></ol></article></div>
+      </section>
+      <section class="page" id="invoices"><div class="page-head"><div><h2>Inkoopfacturen</h2><p>UBL/XML en Copilot JSON worden lokaal verwerkt.</p></div><label class="button primary">Importeren<input id="invoiceImport" type="file" multiple accept=".xml,.json,application/xml,text/xml,application/json" hidden></label></div><div class="card table-card"><div class="toolbar"><input id="invoiceSearch" class="input" placeholder="Zoek leverancier, factuurnummer of omschrijving"><select id="invoiceStatus" class="input"><option value="">Alle statussen</option><option value="pending">Wacht op controle</option><option value="approved">Goedgekeurd</option><option value="rejected">Afgekeurd</option><option value="invalid">Ongeldig</option></select></div><div class="table-scroll"><table><thead><tr><th>Datum</th><th>Leverancier</th><th>Factuurnummer</th><th>Omschrijving</th><th class="number">Totaal</th><th>Status</th><th></th></tr></thead><tbody id="invoiceRows"></tbody></table></div></div></section>
+      <section class="page" id="concepts"><div class="page-head"><div><h2>Conceptboekingen</h2><p>Elke boeking vereist expliciete goedkeuring.</p></div></div><div class="kpi-grid"><article class="card"><span>Wacht op controle</span><b id="conceptPending">0</b></article><article class="card"><span>Goedgekeurd</span><b id="conceptApproved">0</b></article><article class="card"><span>Afgekeurd</span><b id="conceptRejected">0</b></article><article class="card"><span>Ongeldig</span><b id="conceptInvalid">0</b></article></div><div class="card table-card gap-top"><div class="table-scroll"><table><thead><tr><th>Import</th><th>Leverancier</th><th>Factuur</th><th class="number">Debet</th><th class="number">Credit</th><th>Status</th><th></th></tr></thead><tbody id="conceptRows"></tbody></table></div></div></section>
+      <section class="page" id="journal"><div class="page-head"><div><h2>Journaal</h2><p>Definitieve, goedgekeurde boekingen.</p></div><button id="journalCsv" class="button ghost">CSV export</button></div><div class="card table-card"><div class="table-scroll"><table><thead><tr><th>Boekstuk</th><th>Datum</th><th>Omschrijving</th><th>Relatie</th><th class="number">Bedrag</th><th>Bron</th></tr></thead><tbody id="journalRows"></tbody></table></div></div></section>
+      <section class="page" id="ledger"><div class="page-head"><div><h2>Grootboek</h2><p>Mutaties en saldo per rekening.</p></div></div><div class="card table-card"><div class="table-scroll"><table><thead><tr><th>Rekening</th><th>Naam</th><th>Type</th><th class="number">Debet</th><th class="number">Credit</th><th class="number">Saldo</th></tr></thead><tbody id="ledgerRows"></tbody></table></div></div></section>
+      <section class="page" id="reports"><div class="page-head"><div><h2>Rapportages</h2><p>Proefbalans, winst en verlies en balans.</p></div></div><div class="tabs"><button data-report="trial" class="button primary">Proefbalans</button><button data-report="pl" class="button ghost">Winst en verlies</button><button data-report="balance" class="button ghost">Balans</button></div><article class="card report" id="reportOutput"></article></section>
+      <section class="page" id="contacts"><div class="page-head"><div><h2>Relaties</h2><p>Leveranciers worden bij import automatisch als relatie voorgesteld.</p></div><button id="newContact" class="button primary">Nieuwe relatie</button></div><div class="card table-card"><div class="table-scroll"><table><thead><tr><th>Naam</th><th>Type</th><th>BTW-nummer</th><th>IBAN</th><th>E-mail</th></tr></thead><tbody id="contactRows"></tbody></table></div></div></section>
+      <section class="page" id="settings"><div class="page-head"><div><h2>Instellingen en audit</h2><p>Lokale administratie, back-up en verwerkingshistorie.</p></div></div><div class="two-col"><article class="card form-card"><h3>Administratie</h3><label>Bedrijfsnaam<input id="settingCompany" class="input"></label><label>Administratiecode<input id="settingCode" class="input"></label><label>Boekjaar<input id="settingYear" class="input" type="number"></label><button id="saveSettings" class="button primary">Opslaan</button></article><article class="card"><h3>Gegevensbeheer</h3><p>De database staat lokaal in IndexedDB.</p><div class="button-row"><button id="backupButton" class="button ghost">Back-up downloaden</button><label class="button ghost">Back-up herstellen<input id="restoreInput" type="file" accept="application/json" hidden></label><button id="sampleButton" class="button ghost">Voorbeeld-JSON</button><button id="clearButton" class="button danger">Administratie wissen</button></div></article></div><div class="card table-card gap-top"><div class="toolbar"><div><strong>Audittrail</strong><small>Import, validatie, goedkeuring en wijzigingen</small></div><button id="auditCsv" class="button ghost">CSV export</button></div><div class="table-scroll"><table><thead><tr><th>Tijdstip</th><th>Actie</th><th>Object</th><th>Details</th></tr></thead><tbody id="auditRows"></tbody></table></div></div></section>
+    </div>
+  </main>
+</div>
+<div id="reviewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="reviewTitle"><div class="modal-card"><div class="modal-head"><h2 id="reviewTitle">Controle conceptboeking</h2><button id="closeReview" class="icon-button" aria-label="Sluiten">×</button></div><div id="reviewBody" class="modal-body"></div><div id="reviewActions" class="modal-actions"></div></div></div>
+<div id="contactModal" class="modal" role="dialog" aria-modal="true"><div class="modal-card small"><div class="modal-head"><h2>Nieuwe relatie</h2><button id="closeContact" class="icon-button">×</button></div><form id="contactForm" class="modal-body form-card"><label>Naam<input name="name" class="input" required></label><label>Type<select name="type" class="input"><option>Leverancier</option><option>Klant</option><option>Beide</option></select></label><label>BTW-nummer<input name="vat" class="input"></label><label>IBAN<input name="iban" class="input"></label><label>E-mail<input name="email" class="input" type="email"></label><div class="modal-actions"><button type="button" id="cancelContact" class="button ghost">Annuleren</button><button class="button primary">Opslaan</button></div></form></div></div>
+<nav class="mobile-bottom-nav" aria-label="Mobiele navigatie">
+  <button data-mobile-page="dashboard" class="active"><span>▦</span><small>Overzicht</small></button>
+  <button data-mobile-page="invoices"><span>▣</span><small>Facturen</small></button>
+  <label class="center-import" aria-label="Importeren"><span>＋</span><input id="bottomImport" type="file" accept=".xml,.json,application/xml,text/xml,application/json" hidden></label>
+  <button data-mobile-page="concepts"><span>✓</span><small>Controleren</small></button>
+  <button data-mobile-page="settings"><span>⚙</span><small>Meer</small></button>
+</nav>
+<div id="toast" class="toast" role="status"></div>
+<script src="db.js"></script><script src="ubl.js"></script><script src="app.js"></script>
+</body></html>
